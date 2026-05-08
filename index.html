@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Michal Rogalinski — Software Development & .NET Consulting</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #111118;
+            --bg-card: #16161f;
+            --bg-card-hover: #1c1c28;
+            --text-primary: #e8e6e1;
+            --text-secondary: #9a9890;
+            --text-muted: #5c5a54;
+            --accent: #c9943e;
+            --accent-light: #dbb06a;
+            --accent-dim: rgba(201, 148, 62, 0.12);
+            --accent-glow: rgba(201, 148, 62, 0.06);
+            --border: rgba(255, 255, 255, 0.06);
+            --border-accent: rgba(201, 148, 62, 0.25);
+            --font-display: 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'DM Sans', system-ui, sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        /* ── Noise overlay ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ── Navigation ── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: padding 0.4s ease;
+        }
+
+        nav.scrolled { padding: 1rem 3rem; }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: 0.02em;
+        }
+
+        .nav-logo span { color: var(--accent); }
+
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+
+        .nav-links a {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover { color: var(--accent-light); }
+        .nav-links a:hover::after { width: 100%; }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px;
+        }
+
+        .hamburger span {
+            width: 24px;
+            height: 1.5px;
+            background: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 70% 40%, var(--accent-glow) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 50% at 20% 80%, rgba(30, 30, 60, 0.3) 0%, transparent 70%);
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 80px 80px;
+            mask-image: radial-gradient(ellipse 70% 60% at 60% 50%, black 20%, transparent 70%);
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8rem 3rem 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-left { z-index: 1; }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s ease 0.3s forwards;
+        }
+
+        .hero-tag::before {
+            content: '';
+            width: 32px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 5.5vw, 4.8rem);
+            font-weight: 700;
+            line-height: 1.08;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 0.8s ease 0.5s forwards;
+        }
+
+        .hero-title em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            max-width: 460px;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s ease 0.7s forwards;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem 2.2rem;
+            background: var(--accent);
+            color: var(--bg-primary);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s ease 0.9s forwards;
+        }
+
+        .hero-cta:hover {
+            background: var(--accent-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(201, 148, 62, 0.25);
+        }
+
+        .hero-cta svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .hero-cta:hover svg { transform: translateX(4px); }
+
+        .hero-right {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 1.2s ease 0.6s forwards;
+        }
+
+        .hero-monogram {
+            position: relative;
+            width: 320px;
+            height: 320px;
+        }
+
+        .monogram-ring {
+            position: absolute;
+            inset: 0;
+            border: 1px solid var(--border-accent);
+            border-radius: 50%;
+            animation: spin 30s linear infinite;
+        }
+
+        .monogram-ring:nth-child(2) {
+            inset: 20px;
+            animation-duration: 25s;
+            animation-direction: reverse;
+            border-style: dashed;
+            border-color: var(--border);
+        }
+
+        .monogram-ring:nth-child(3) {
+            inset: 50px;
+            animation-duration: 20s;
+            border-color: var(--accent-dim);
+        }
+
+        .monogram-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 5rem;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 0.05em;
+        }
+
+        .hero-stats {
+            position: absolute;
+            bottom: 4rem;
+            left: 3rem;
+            right: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            opacity: 0;
+            animation: fadeUp 0.8s ease 1.1s forwards;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* ── Section common ── */
+        section { padding: 7rem 3rem; position: relative; }
+
+        .section-header {
+            max-width: 1200px;
+            margin: 0 auto 4rem;
+        }
+
+        .section-tag {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .section-tag::before {
+            content: '';
+            width: 24px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.2rem, 4vw, 3.2rem);
+            font-weight: 700;
+            line-height: 1.15;
+            color: var(--text-primary);
+            max-width: 600px;
+        }
+
+        /* ── Services ── */
+        .services { background: var(--bg-secondary); }
+
+        .services-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .service-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-accent);
+            transform: translateY(-4px);
+        }
+
+        .service-card:hover::before { opacity: 1; }
+
+        .service-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-dim);
+            border: 1px solid var(--border-accent);
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+
+        .service-icon svg { width: 22px; height: 22px; }
+
+        .service-card h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.8rem;
+        }
+
+        .service-card p {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .service-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .service-tech span {
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.35rem 0.8rem;
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid rgba(201, 148, 62, 0.15);
+        }
+
+        /* ── About ── */
+        .about-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .about-text p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .about-text p:first-of-type {
+            font-size: 1.15rem;
+            color: var(--text-primary);
+            font-weight: 300;
+        }
+
+        .about-highlights {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .highlight-item {
+            display: flex;
+            gap: 1.2rem;
+            align-items: flex-start;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: all 0.4s ease;
+        }
+
+        .highlight-item:hover {
+            border-color: var(--border-accent);
+            background: var(--bg-card-hover);
+        }
+
+        .highlight-number {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1;
+            min-width: 50px;
+        }
+
+        .highlight-text h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .highlight-text p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* ── Contact ── */
+        .contact { background: var(--bg-secondary); }
+
+        .contact-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .contact-info { display: flex; flex-direction: column; gap: 2rem; }
+
+        .contact-block h3 {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+        }
+
+        .contact-block p,
+        .contact-block a {
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            line-height: 1.7;
+            transition: color 0.3s ease;
+        }
+
+        .contact-block a:hover { color: var(--accent); }
+
+        .contact-form { display: flex; flex-direction: column; gap: 1.2rem; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .contact-form input::placeholder,
+        .contact-form textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: var(--border-accent);
+            background: var(--bg-card-hover);
+        }
+
+        .contact-form textarea { resize: vertical; min-height: 140px; }
+
+        .form-submit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            padding: 1rem 2.2rem;
+            background: var(--accent);
+            color: var(--bg-primary);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            width: fit-content;
+        }
+
+        .form-submit:hover {
+            background: var(--accent-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(201, 148, 62, 0.25);
+        }
+
+        /* ── Footer ── */
+        footer {
+            padding: 2.5rem 3rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1260px;
+            margin: 0 auto;
+        }
+
+        .footer-left {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .footer-right {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .footer-right a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-right a:hover { color: var(--accent); }
+
+        /* ── Scroll animations ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── Keyframes ── */
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 968px) {
+            nav { padding: 1.2rem 2rem; }
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(10, 10, 15, 0.95);
+                backdrop-filter: blur(20px);
+                padding: 2rem;
+                gap: 1.5rem;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                padding: 7rem 2rem 4rem;
+                text-align: center;
+            }
+            .hero-subtitle { margin-left: auto; margin-right: auto; }
+            .hero-right { order: -1; }
+            .hero-monogram { width: 220px; height: 220px; }
+            .monogram-text { font-size: 3.5rem; }
+            .hero-stats {
+                left: 2rem;
+                right: 2rem;
+                gap: 2rem;
+                flex-wrap: wrap;
+            }
+
+            section { padding: 5rem 2rem; }
+            .services-grid { grid-template-columns: 1fr; }
+            .about-content { grid-template-columns: 1fr; gap: 3rem; }
+            .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            .hero-content { padding: 6rem 1.5rem 3rem; }
+            section { padding: 4rem 1.5rem; }
+            .hero-stats { bottom: 2rem; gap: 1.5rem; }
+            .stat-number { font-size: 1.5rem; }
+            footer { flex-direction: column; gap: 1rem; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="nav-logo">MR<span>.</span></a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#services">Services</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-content">
+            <div class="hero-left">
+                <div class="hero-tag">Software Consultancy</div>
+                <h1 class="hero-title">Crafting <em>robust</em> software with .NET precision</h1>
+                <p class="hero-subtitle">Expert C# and .NET consulting for enterprises that demand reliable, scalable, and maintainable solutions. Based in Wrocław, delivering worldwide.</p>
+                <a href="#contact" class="hero-cta">
+                    Start a conversation
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+            <div class="hero-right">
+                <div class="hero-monogram">
+                    <div class="monogram-ring"></div>
+                    <div class="monogram-ring"></div>
+                    <div class="monogram-ring"></div>
+                    <div class="monogram-text">MR</div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-item">
+                <span class="stat-number">10+</span>
+                <span class="stat-label">Years Experience</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">.NET</span>
+                <span class="stat-label">Core Expertise</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">C#</span>
+                <span class="stat-label">Primary Language</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">Wrocław</span>
+                <span class="stat-label">Based In Poland</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services -->
+    <section class="services" id="services">
+        <div class="section-header reveal">
+            <div class="section-tag">What I Do</div>
+            <h2 class="section-title">Specialized .NET services for complex challenges</h2>
+        </div>
+        <div class="services-grid">
+            <div class="service-card reveal">
+                <div class="service-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/><line x1="14" y1="4" x2="10" y2="20"/></svg>
+                </div>
+                <h3>C# Development</h3>
+                <p>Full-cycle application development in C# — from greenfield projects to modernizing legacy systems. Clean architecture, SOLID principles, and production-grade code.</p>
+                <div class="service-tech">
+                    <span>C# 12</span>
+                    <span>LINQ</span>
+                    <span>Async/Await</span>
+                    <span>xUnit</span>
+                </div>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M7 8h4M7 11h2"/></svg>
+                </div>
+                <h3>.NET Consulting</h3>
+                <p>Strategic guidance on .NET platform adoption, migration to .NET 8+, performance optimization, and cloud-native transformation with Azure integration.</p>
+                <div class="service-tech">
+                    <span>.NET 8</span>
+                    <span>ASP.NET Core</span>
+                    <span>Azure</span>
+                    <span>EF Core</span>
+                </div>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                </div>
+                <h3>Software Architecture</h3>
+                <p>Designing scalable system architectures — microservices, domain-driven design, event-driven patterns, and distributed systems built for growth.</p>
+                <div class="service-tech">
+                    <span>DDD</span>
+                    <span>CQRS</span>
+                    <span>Microservices</span>
+                    <span>CI/CD</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section class="about" id="about">
+        <div class="about-content">
+            <div class="about-text reveal">
+                <div class="section-tag">About</div>
+                <h2 class="section-title" style="margin-bottom: 2rem;">Engineering excellence, delivered personally</h2>
+                <p>I'm Michal Rogalinski — a software engineer and consultant specializing in the Microsoft .NET ecosystem. I partner with companies to build, optimize, and modernize their software systems.</p>
+                <p>With deep expertise in C# and the .NET platform, I bring a hands-on, pragmatic approach to every engagement. Whether you need a senior developer embedded in your team or an architect to design your next system, I deliver solutions that are built to last.</p>
+                <p>Based in Wrocław, Poland — one of Europe's leading tech hubs — I work with clients across industries and geographies, combining local presence with global reach.</p>
+            </div>
+            <div class="about-highlights reveal">
+                <div class="highlight-item">
+                    <span class="highlight-number">01</span>
+                    <div class="highlight-text">
+                        <h4>Hands-On Delivery</h4>
+                        <p>Not just advice — I write production code and ship alongside your team.</p>
+                    </div>
+                </div>
+                <div class="highlight-item">
+                    <span class="highlight-number">02</span>
+                    <div class="highlight-text">
+                        <h4>Deep .NET Expertise</h4>
+                        <p>From legacy .NET Framework to modern .NET 8, covering the full platform spectrum.</p>
+                    </div>
+                </div>
+                <div class="highlight-item">
+                    <span class="highlight-number">03</span>
+                    <div class="highlight-text">
+                        <h4>Quality-First Mindset</h4>
+                        <p>Clean code, comprehensive testing, and thorough documentation as standard practice.</p>
+                    </div>
+                </div>
+                <div class="highlight-item">
+                    <span class="highlight-number">04</span>
+                    <div class="highlight-text">
+                        <h4>Flexible Engagement</h4>
+                        <p>Project-based, team augmentation, or advisory — structured to fit your needs.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact" id="contact">
+        <div class="section-header reveal">
+            <div class="section-tag">Get In Touch</div>
+            <h2 class="section-title">Let's discuss your next project</h2>
+        </div>
+        <div class="contact-grid">
+            <div class="contact-info reveal">
+                <div class="contact-block">
+                    <h3>Office</h3>
+                    <p>Gorlicka 54C/1<br>Wrocław, Poland</p>
+                </div>
+                <div class="contact-block">
+                    <h3>Email</h3>
+                    <a href="mailto:rogalinsky@gmail.com">rogalinsky@gmail.com</a>
+                </div>
+                <div class="contact-block">
+                    <h3>Availability</h3>
+                    <p>Currently accepting new projects.<br>Response within 24 hours.</p>
+                </div>
+            </div>
+            <form class="contact-form reveal" onsubmit="event.preventDefault(); alert('Thank you for your message. I will get back to you shortly.');">
+                <div class="form-row">
+                    <input type="text" placeholder="Your name" required>
+                    <input type="email" placeholder="Your email" required>
+                </div>
+                <input type="text" placeholder="Subject">
+                <textarea placeholder="Tell me about your project..."></textarea>
+                <button type="submit" class="form-submit">
+                    Send Message
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-left">&copy; 2026 Michal Rogalinski. All rights reserved.</div>
+        <div class="footer-right">
+            <a href="https://www.linkedin.com/in/michal-rogalinski-8314529/" target="_blank" rel="noopener">LinkedIn</a>
+            &nbsp;&middot;&nbsp;
+            <a href="https://github.com/rogalmic" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </footer>
+
+    <script>
+        // Nav scroll effect
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Hamburger menu
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('open');
+        });
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => navLinks.classList.remove('open'));
+        });
+
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => entry.target.classList.add('visible'), i * 100);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>
